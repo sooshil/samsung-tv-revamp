@@ -32,7 +32,7 @@ You need:
 | A computer on the same Wi-Fi/network as the TV | Tested on a Mac (Apple Silicon). Linux should work; Windows is untested (use WSL). |
 | A free Samsung account | For the developer certificate (step 4). |
 | [Node.js](https://nodejs.org) 20 or newer | Run `node -v` to check. |
-| [Visual Studio Code](https://code.visualstudio.com) with the the official Samsung/Tizen extension for VS Code (search "Tizen" in the Extensions view) | Creates your certificate and installs the Tizen tools (including the `tizen` command-line tool) this project uses. |
+| [Visual Studio Code](https://code.visualstudio.com) with the **Tizen extension** (search "Tizen" in the Extensions view) | Creates your certificate and installs the Tizen tools (including the `tizen` command-line tool) this project uses. |
 | About 30 minutes | Most of it is the one-time certificate setup. |
 
 > **Apple Silicon Mac:** Tizen's `sdb` tool is built for Intel. Install Rosetta once: `softwareupdate --install-rosetta --agree-to-license`.
