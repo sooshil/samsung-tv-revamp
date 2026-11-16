@@ -1,5 +1,5 @@
 #!/bin/bash
-# Registers your Samsung certificate (made with Certificate Manager, see README step 4) as a Tizen CLI signing profile.
+# Registers your Samsung certificate (made with the VS Code Tizen extension, see README step 4) as a Tizen CLI signing profile.
 # It does not create or change certificates. The passwords are read silently and never stored by this script.
 # Usage: scripts/register-signing-profile.sh <folder with author.p12 and distributor.p12> [profile-name]
 set -euo pipefail

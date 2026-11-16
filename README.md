@@ -32,7 +32,7 @@ You need:
 | A computer on the same Wi-Fi/network as the TV | Tested on a Mac (Apple Silicon). Linux should work; Windows is untested (use WSL). |
 | A free Samsung account | For the developer certificate (step 4). |
 | [Node.js](https://nodejs.org) 20 or newer | Run `node -v` to check. |
-| [Tizen Studio](https://developer.tizen.org/development/tizen-studio/download) with the **TV Extensions** | Provides the signing tools and the `tizen` command-line tool. |
+| [Visual Studio Code](https://code.visualstudio.com) with the the official Samsung/Tizen extension for VS Code (search "Tizen" in the Extensions view) | Creates your certificate and installs the Tizen tools (including the `tizen` command-line tool) this project uses. |
 | About 30 minutes | Most of it is the one-time certificate setup. |
 
 > **Apple Silicon Mac:** Tizen's `sdb` tool is built for Intel. Install Rosetta once: `softwareupdate --install-rosetta --agree-to-license`.
@@ -67,8 +67,8 @@ cp config/example.local.env config/local.env
 cp config/example.local.json config/local.json
 ```
 
-Edit **`config/local.env`**: set `TV_IP` to your TV's IP address, and `TIZEN_SDK` to where Tizen Studio is installed
-(default `~/tizen-studio`).
+Edit **`config/local.env`**: set `TV_IP` to your TV's IP address, and `TIZEN_SDK` to the folder where the Tizen tools were installed by the extension
+(default `~/tizen-studio`; it contains `tools/ide/bin/tizen`).
 
 Edit **`config/local.json`** (optional, only for the weather): your place name and latitude/longitude.
 To find the numbers, right-click your home in Google Maps and click the coordinates to copy them.
@@ -85,11 +85,13 @@ widget is simply hidden.
 
 Samsung only lets apps run on a TV if they are signed with a certificate that knows your TV. You create it once.
 
-1. Open **Tizen Studio → Tools → Certificate Manager** (or use the *Tizen* extension for VS Code).
-2. Click **+**, choose **Samsung** → **TV** → create a **new certificate**, and sign in with your Samsung account.
-3. Choose **Public** / **Individual**, give it a name, and set a **password** (store it in a password manager, you cannot recover it).
-4. When asked for the **device (TV) DUID**, connect your TV: with the TV in Developer Mode (step 2), Tizen Studio's *Device Manager* finds it by IP and shows its DUID. Add it.
+1. In VS Code, install the **Tizen** extension (Extensions view → search "Tizen"). Follow its prompts to install the Tizen tools if it asks.
+2. Open the Command Palette (**Cmd/Ctrl + Shift + P**), type **Tizen**, and choose the certificate command (*Certificate Manager*). Create a new **Samsung** certificate for **TV**, and sign in with your Samsung account when asked.
+3. Choose **Public** / **Individual**, give it a name, and set a **password** (keep it in a password manager; it can't be recovered).
+4. When it asks for your TV's **DUID**, let the extension read it from the TV: the TV must be in Developer Mode (step 2) and reachable at its IP address. Add the TV to the certificate.
 5. Finish. The certificate files (`author.p12`, `distributor.p12`) are saved on your computer, normally under `~/SamsungCertificate/<name>/`.
+
+> The extension's menu wording changes between versions. If a name above doesn't match, search the Command Palette for "Tizen" and look for the certificate and device options.
 
 Now check that the command-line tool can see the signing profile:
 
