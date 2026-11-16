@@ -1,0 +1,29 @@
+# Signing material — never commit
+*.p12
+*.pri
+*.csr
+*.crt
+*.pem
+*.key
+device-profile.xml
+profiles.xml
+.sign/
+author-signature.xml
+signature*.xml
+
+# Local, machine-specific config (TV IP, tokens, weather API keys)
+config/local.*
+.env
+.env.*
+
+# Build output
+*.wgt
+Debug/
+Release/
+build/
+dist/
+node_modules/
+
+# macOS
+.DS_Store
+.buildResult/

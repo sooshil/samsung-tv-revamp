@@ -1,0 +1,19 @@
+{
+  "name": "samsung-tv-revamp",
+  "version": "0.8.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Custom dashboard for Samsung UN75TU690TFXZA (Tizen 6.0, Chromium 76)",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:bench": "node scripts/build.mjs --bench",
+    "dev": "node scripts/build.mjs --serve",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/build.mjs --tests && node --test build/tests/",
+    "deploy": "npm run build && scripts/deploy.sh dist tvrevamp00.Dashboard"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0",
+    "typescript": "5.6.3"
+  }
+}

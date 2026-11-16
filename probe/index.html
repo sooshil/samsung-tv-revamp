@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TV Revamp Probe</title>
+<script src="$WEBAPIS/webapis/webapis.js"></script>
+<style>
+  html, body { margin: 0; background: #0b0d12; color: #e8eaf0; font: 22px/1.4 sans-serif; overflow: hidden; }
+  #wrap { padding: 48px 72px; }
+  h1 { font-size: 40px; margin: 0 0 8px; font-weight: 600; }
+  #status { color: #9aa3b5; margin-bottom: 24px; }
+  #log { height: 430px; overflow: hidden; font-family: monospace; font-size: 18px; color: #b9c2d4; white-space: pre-wrap; }
+  .row { display: flex; margin: 24px 0; }
+  .btn { margin-right: 24px; padding: 18px 32px; border-radius: 14px; background: #1c2130; border: 3px solid transparent; font-size: 24px; }
+  .btn.focus { border-color: #fff; background: #2d3550; transform: scale(1.06); }
+  #perf { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: none; background: #0b0d12; }
+  .card { position: absolute; width: 320px; height: 180px; border-radius: 18px;
+          background: linear-gradient(135deg, #3a4b8a, #8a3a6b); box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>TV Revamp Probe</h1>
+  <div id="status">Collecting diagnostics…</div>
+  <div class="row" id="buttons"></div>
+  <div id="log"></div>
+</div>
+<div id="perf"></div>
+<script src="probe.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html><html><head><style>html,body{margin:0;width:512px;height:512px;overflow:hidden;background:#000}</style></head><body>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#0b1030"/>
+      <stop offset="0.55" stop-color="#28306e"/>
+      <stop offset="1" stop-color="#6a4fb3"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.62" r="0.5">
+      <stop offset="0" stop-color="#9fb8ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#9fb8ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ridgeFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2f63"/><stop offset="1" stop-color="#1a1d45"/>
+    </linearGradient>
+    <linearGradient id="ridgeNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141634"/><stop offset="1" stop-color="#0a0b1f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+  <!-- stars -->
+  <g fill="#ffffff">
+    <circle cx="72" cy="78" r="2.2" opacity=".8"/><circle cx="140" cy="44" r="1.6" opacity=".6"/>
+    <circle cx="210" cy="96" r="1.4" opacity=".5"/><circle cx="318" cy="58" r="1.8" opacity=".7"/>
+    <circle cx="452" cy="92" r="2" opacity=".75"/><circle cx="420" cy="170" r="1.4" opacity=".5"/>
+    <circle cx="48" cy="190" r="1.5" opacity=".5"/><circle cx="104" cy="140" r="1.2" opacity=".45"/>
+  </g>
+  <!-- sparkle -->
+  <path d="M386 112 L392 132 L412 138 L392 144 L386 164 L380 144 L360 138 L380 132 Z" fill="#ffffff" opacity=".95"/>
+  <!-- mountains -->
+  <path d="M0 392 L84 330 L140 362 L214 296 L292 356 L352 318 L432 372 L512 336 L512 512 L0 512 Z" fill="url(#ridgeFar)"/>
+  <path d="M0 440 L96 396 L170 428 L256 382 L346 430 L420 404 L512 436 L512 512 L0 512 Z" fill="url(#ridgeNear)"/>
+  <!-- home mark -->
+  <g fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M156 270 L256 186 L356 270"/>
+    <path d="M184 252 V352 H328 V252"/>
+  </g>
+  <rect x="236" y="296" width="40" height="56" rx="8" fill="#ffffff"/>
+</svg></body></html>

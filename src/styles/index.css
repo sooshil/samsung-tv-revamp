@@ -1,0 +1,198 @@
+/* Samsung TU690T dashboard. Chromium 76: no clamp(), aspect-ratio, inset or :focus-visible.
+   Performance rule (measured): only transform and opacity animate; shadows never repaint while moving. */
+
+:root {
+  --safe-x: 96px;
+  --text: #f4f5f8;
+  --text-dim: rgba(244, 245, 248, 0.62);
+  --text-faint: rgba(244, 245, 248, 0.38);
+  --surface: rgba(18, 20, 28, 0.72);
+  --ring: #ffffff;
+  --accent: #8fb4ff;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 220ms;
+}
+body[data-theme='graphite'] { --accent: #d6d9e0; --surface: rgba(24, 24, 26, 0.78); }
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; width: 1920px; height: 1080px; overflow: hidden;
+  background: #05060a; color: var(--text);
+  font-family: 'SamsungOne', 'Samsung Sans', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; cursor: none; user-select: none;
+}
+#root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+
+/* ---------- Background ---------- */
+.bg-stage, .bg-layer, .bg-scrim, .screens, .screen { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+.bg-layer {
+  background: #05060a center / cover no-repeat;
+  opacity: 0; transition: opacity 1600ms ease-in-out; will-change: opacity;
+}
+.bg-layer.visible { opacity: 1; }
+.bg-layer.instant { transition: none; }
+.bg-scrim {
+  /* Painted once: keeps text legible over any photo. */
+  background:
+    linear-gradient(180deg, rgba(5,6,10,0.55) 0%, rgba(5,6,10,0) 22%),
+    linear-gradient(90deg, rgba(5,6,10,0.70) 0%, rgba(5,6,10,0.15) 55%, rgba(5,6,10,0) 75%),
+    linear-gradient(0deg, rgba(5,6,10,0.92) 0%, rgba(5,6,10,0.55) 40%, rgba(5,6,10,0) 62%);
+}
+
+/* ---------- Screens ---------- */
+.screen { opacity: 0; visibility: hidden; transition: opacity 260ms ease, visibility 0s linear 260ms; }
+.screen.active { opacity: 1; visibility: visible; transition: opacity 260ms ease; }
+
+/* ---------- Header ---------- */
+.top { position: absolute; left: var(--safe-x); right: var(--safe-x); top: 56px; display: flex; justify-content: space-between; align-items: flex-start; }
+.clock-time { font-size: 64px; font-weight: 300; letter-spacing: -1px; line-height: 1; }
+.clock-date { margin-top: 12px; font-size: 26px; color: var(--text-dim); }
+.top-actions { display: flex; }
+.icon-btn {
+  position: relative; width: 76px; height: 76px; margin-left: 20px; border-radius: 38px;
+  color: var(--text-dim); background: rgba(255,255,255,0.06);
+  transition: transform var(--dur) var(--ease), background-color var(--dur) ease, color var(--dur) ease;
+}
+.icon-glyph { position: absolute; left: 22px; top: 22px; width: 32px; height: 32px; display: block; }
+.icon-label { display: none; }
+.icon-btn.focused { transform: scale(1.12); background: rgba(255,255,255,0.95); color: #0b0d12; }
+
+/* ---------- Hero ---------- */
+.hero { position: absolute; left: var(--safe-x); top: 300px; width: 1100px; }
+.hero-title { margin: 0; font-size: 84px; font-weight: 600; letter-spacing: -1.5px; line-height: 1.05; }
+.hero-sub { margin-top: 14px; font-size: 28px; color: var(--text-dim); height: 36px; }
+.hero { transition: opacity 180ms ease; }
+.hero.changing { opacity: 0; }
+.credit { position: absolute; right: var(--safe-x); bottom: 36px; font-size: 20px; color: var(--text-faint); }
+
+/* ---------- Rows ---------- */
+.rows { position: absolute; left: 0; top: 520px; width: 1920px; }
+.row { position: relative; width: 1920px; overflow: hidden; padding: 0 0 0 var(--safe-x); }
+.row-fav { height: 300px; padding-top: 20px; }
+.row-all { height: 240px; }
+.row-title { margin: 0 0 14px; font-size: 26px; font-weight: 500; color: var(--text-dim); }
+.row-track { display: flex; transition: transform 320ms var(--ease); }
+
+/* ---------- Cards ---------- */
+.card { position: relative; flex: none; transition: transform var(--dur) var(--ease); }
+.card.large { width: 400px; height: 225px; margin-right: 36px; }
+.card.small { width: 264px; height: 148px; margin-right: 28px; }
+.tile {
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 18px; overflow: hidden;
+  background-color: #1a1d27;
+}
+.card.small .tile { border-radius: 14px; }
+.app-icon { position: absolute; left: 50%; top: 50%; width: 152px; height: 152px; margin: -76px 0 0 -76px; border-radius: 28px; object-fit: contain; }
+.card.small .app-icon { width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 20px; }
+.app-glyph { position: absolute; left: 50%; top: 50%; width: 176px; height: 124px; margin: -62px 0 0 -88px; }
+.card.small .app-glyph { width: 116px; height: 82px; margin: -41px 0 0 -58px; }
+.app-glyph svg { display: block; width: 100%; height: 100%; }
+.wordmark {
+  position: absolute; left: 24px; right: 24px; top: 50%; margin-top: -26px; text-align: center;
+  font-size: 40px; line-height: 52px; font-weight: 600; letter-spacing: -0.5px; color: rgba(255,255,255,0.94);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card.small .wordmark { left: 16px; right: 16px; font-size: 27px; margin-top: -18px; line-height: 36px; }
+
+/* Focus: ring fades in via opacity; the card scales via transform.
+   No blurred shadows: measured on the TV, a focus glow halved navigation frame rate (docs/technical-feasibility.md). */
+.card-ring { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 18px; border: 4px solid var(--ring); opacity: 0; transition: opacity var(--dur) ease; }
+.card.small .card-ring { border-radius: 14px; }
+.card-label {
+  position: absolute; left: 0; top: 100%; width: 100%; margin-top: 16px; text-align: center;
+  font-size: 24px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transition: opacity var(--dur) ease;
+}
+.card.large .card-label { display: none; } /* the hero shows the focused favourite's name */
+.card.focused { transform: scale(1.08); z-index: 2; }
+.card.focused .card-ring, .card.focused .card-label { opacity: 1; }
+
+/* ---------- Settings ---------- */
+.settings { background: rgba(5,6,10,0.55); }
+.settings-title { position: absolute; left: var(--safe-x); top: 72px; margin: 0; font-size: 64px; font-weight: 600; }
+.settings-viewport { position: absolute; left: var(--safe-x); top: 180px; width: 1100px; height: 740px; overflow: hidden; }
+.settings-list { padding-top: 14px; will-change: transform; transition: transform 200ms var(--ease); }
+.setting {
+  display: flex; justify-content: space-between; align-items: center; height: 104px; padding: 0 36px; margin-bottom: 14px;
+  border-radius: 18px; background: var(--surface); transition: transform var(--dur) var(--ease), background-color var(--dur) ease;
+}
+.setting.focused { background: rgba(255,255,255,0.95); color: #0b0d12; transform: scale(1.02); }
+.setting-label { font-size: 32px; font-weight: 500; }
+.setting-hint { margin-top: 6px; font-size: 22px; color: var(--text-faint); }
+.setting.focused .setting-hint { color: rgba(11,13,18,0.55); }
+.setting-value { font-size: 30px; color: var(--text-dim); white-space: pre; }
+.setting.focused .setting-value { color: #0b0d12; }
+.settings-about { position: absolute; left: var(--safe-x); bottom: 56px; font-size: 22px; color: var(--text-faint); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: absolute; left: 50%; bottom: 72px; padding: 20px 40px; white-space: nowrap;
+  border-radius: 40px; background: rgba(20,22,30,0.92); font-size: 26px;
+  opacity: 0; transform: translate3d(-50%, 16px, 0); transition: opacity 240ms ease, transform 240ms var(--ease);
+}
+.toast.visible { opacity: 1; transform: translate3d(-50%, 0, 0); }
+
+/* ---------- Reduced motion ---------- */
+body.reduced-motion *, body.reduced-motion .bg-layer { transition-duration: 0ms !important; }
+body.reduced-motion .card.focused { transform: none; }
+
+/* ---------- Screensaver ---------- */
+.saver { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: #000; z-index: 50;
+  opacity: 0; visibility: hidden; transition: opacity 600ms ease, visibility 0s linear 600ms; overflow: hidden; }
+.saver.on { opacity: 1; visibility: visible; transition: opacity 600ms ease; }
+.saver-photo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: block;
+  opacity: 0; transform: scale(1.02); }
+.saver-photo[src] { will-change: opacity, transform; }
+/* While the screensaver covers everything, drop the dashboard's own layers to save memory. */
+body.saver-on .bg-stage, body.saver-on .screens { visibility: hidden; }
+.saver-photo.visible { opacity: 1; transition: opacity 2000ms ease-in-out, transform 42000ms linear; }
+/* Slow pan-and-zoom, compositor-only. Each photo drifts a different way. */
+.saver-photo.visible.pan-a { transform: scale(1.14) translate3d(-40px, -20px, 0); }
+.saver-photo.visible.pan-b { transform: scale(1.14) translate3d(40px, 20px, 0); }
+.saver-photo.visible.pan-c { transform: scale(1.14) translate3d(-40px, 24px, 0); }
+.saver-photo.visible.pan-d { transform: scale(1.14) translate3d(40px, -24px, 0); }
+.saver-scrim { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 24%), rgba(0,0,0,0.26); } /* painted once; keeps the caption readable */
+.saver-caption { position: absolute; right: 72px; bottom: 56px; text-align: right; opacity: 0; transition: opacity 900ms ease; }
+.saver-caption.shown { opacity: 0.6; }
+.saver-cap-name { font-size: 28px; font-weight: 500; color: #fff; }
+.saver-cap-credit { margin-top: 6px; font-size: 20px; color: rgba(255,255,255,0.75); }
+.saver-clock { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 800ms ease; color: rgba(255,255,255,0.88); }
+.saver-clock.shown { opacity: 1; }
+.saver-time { font-size: 120px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+.saver-date { margin-top: 14px; font-size: 32px; color: rgba(255,255,255,0.62); }
+body.reduced-motion .saver-photo.visible { transform: scale(1.02); }
+
+/* ---------- Weather (header) ---------- */
+.top-left { display: flex; align-items: flex-start; }
+.weather { margin-left: 56px; padding-left: 56px; border-left: 2px solid rgba(255,255,255,0.14); }
+.weather.empty { display: none; }
+.weather-now { display: flex; align-items: center; height: 64px; }
+.weather-icon { width: 56px; height: 56px; margin-right: 16px; color: var(--text); }
+.weather-temp { font-size: 64px; font-weight: 300; letter-spacing: -1px; line-height: 1; }
+.weather-line { margin-top: 12px; font-size: 26px; color: var(--text-dim); white-space: nowrap; }
+.weather-days { display: flex; margin-top: 14px; }
+.wd { display: flex; align-items: center; margin-right: 28px; font-size: 22px; color: var(--text-dim); white-space: nowrap; }
+.wd-icon { width: 26px; height: 26px; margin: 0 8px; display: inline-block; }
+.saver-weather { margin-top: 10px; font-size: 32px; color: rgba(255,255,255,0.62); }
+
+/* ---------- Shortcut tiles (Samsung system panels) ---------- */
+.shortcut-glyph { position: absolute; left: 50%; top: 26px; width: 56px; height: 56px; margin-left: -28px; color: #fff; }
+.shortcut-name { position: absolute; left: 12px; right: 12px; bottom: 18px; text-align: center; font-size: 24px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card.small.focused .shortcut-name { opacity: 0; } /* the label under the card takes over */
+
+/* ---------- Favourites editor ---------- */
+.favs { background: rgba(5,6,10,0.62); }
+.favs-sub { position: absolute; left: var(--safe-x); top: 150px; font-size: 26px; color: var(--text-dim); }
+.favs-viewport { position: absolute; left: var(--safe-x); top: 220px; width: 1100px; height: 684px; overflow: hidden; }
+.favs-list { will-change: transform; transition: transform 200ms var(--ease); }
+.favs-row { display: flex; align-items: center; height: 68px; margin-bottom: 8px; padding: 0 28px; border-radius: 16px; background: var(--surface); }
+.favs-row.first-other { margin-top: 28px; }
+.favs-num { width: 44px; font-size: 26px; font-weight: 600; color: var(--text-dim); }
+.favs-swatch { width: 72px; height: 40px; margin-right: 24px; border-radius: 8px; background-color: #1a1d27; }
+.favs-name { flex: 1; font-size: 30px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.favs-status { font-size: 24px; color: var(--text-faint); }
+.favs-row.focused { background: rgba(255,255,255,0.95); color: #0b0d12; }
+.favs-row.focused .favs-num, .favs-row.focused .favs-status { color: rgba(11,13,18,0.6); }
+.favs-row.grabbed { background: var(--accent); color: #0b0d12; }
+.favs-hint { position: absolute; left: var(--safe-x); bottom: 56px; font-size: 24px; color: var(--text-dim); }
