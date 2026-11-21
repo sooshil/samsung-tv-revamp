@@ -52,6 +52,23 @@ export function cacheApps(apps: InstalledApp[]): void {
   try { localStorage.setItem(APPS_CACHE, JSON.stringify(apps)); } catch (e) { /* ignore */ }
 }
 
+const appListeners: ((apps: InstalledApp[]) => void)[] = [];
+/** Called whenever refreshApps finds the installed list differs from the cached one. */
+export function onAppsChanged(l: (apps: InstalledApp[]) => void): void { appListeners.push(l); }
+
+let inflight: Promise<InstalledApp[]> | null = null;
+/** Asks the TV for the installed apps (slow, ~5.6 s); caches them and notifies listeners if the list changed. */
+export function refreshApps(): Promise<InstalledApp[]> {
+  if (inflight) return inflight;
+  const before = JSON.stringify(cachedApps());
+  inflight = listApps().then((fresh) => {
+    inflight = null;
+    if (JSON.stringify(fresh) !== before) { cacheApps(fresh); appListeners.forEach((l) => l(fresh)); }
+    return fresh;
+  }, (e) => { inflight = null; throw e; });
+  return inflight;
+}
+
 export function launchApp(id: string): Promise<void> {
   if (!isTV) { console.info('[mock] launch', id); return Promise.resolve(); }
   return new Promise((resolve, reject) => {

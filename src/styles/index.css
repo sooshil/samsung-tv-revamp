@@ -146,6 +146,10 @@ body.reduced-motion .card.focused { transform: none; }
 /* While the screensaver covers everything, drop the dashboard's own layers to save memory. */
 body.saver-on .bg-stage, body.saver-on .screens { visibility: hidden; }
 .saver-photo.visible { opacity: 1; transition: opacity 2000ms ease-in-out, transform 42000ms linear; }
+/* Crossfade stacking: the incoming photo fades in over the old one, which stays opaque underneath. */
+.saver-photo.under { z-index: 1; }
+.saver-photo.top { z-index: 2; }
+.saver-scrim, .saver-caption, .saver-clock { z-index: 3; }
 /* Slow pan-and-zoom, compositor-only. Each photo drifts a different way. */
 .saver-photo.visible.pan-a { transform: scale(1.14) translate3d(-40px, -20px, 0); }
 .saver-photo.visible.pan-b { transform: scale(1.14) translate3d(40px, 20px, 0); }

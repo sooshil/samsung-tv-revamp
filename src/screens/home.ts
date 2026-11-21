@@ -5,7 +5,7 @@ import { ICONS } from '../components/icons';
 import { Clock } from '../components/clock';
 import { FocusModel, FocusPos, ZoneSpec } from '../navigation/focus';
 import { buildCatalog, AppEntry } from '../apps/catalog';
-import { launchApp, listApps, currentAppId, cachedApps, cacheApps, InstalledApp } from '../platform/tizen';
+import { launchApp, refreshApps, onAppsChanged, currentAppId, cachedApps, InstalledApp } from '../platform/tizen';
 import { settings, session } from '../settings/store';
 import type { Intent } from '../platform/keys';
 import type { Router, Screen } from './screen';
@@ -59,11 +59,8 @@ export class HomeScreen implements Screen {
   async load(): Promise<{ cachedRender: boolean }> {
     const cached = cachedApps();
     if (cached) this.applyApps(cached);
-    const fresh = await listApps();
-    if (!cached || JSON.stringify(cached) !== JSON.stringify(fresh)) {
-      cacheApps(fresh);
-      this.applyApps(fresh);
-    }
+    onAppsChanged((apps) => this.applyApps(apps));
+    await refreshApps(); // re-renders through onAppsChanged if the list differs from the cache
     return { cachedRender: !!cached };
   }
 

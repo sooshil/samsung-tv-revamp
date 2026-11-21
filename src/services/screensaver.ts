@@ -14,6 +14,7 @@ import { onVisibility } from '../platform/lifecycle';
 const HOLD_TV_SCREENSAVER = true; // approved by the owner 2026-11-15
 const PHOTO_MS = __SELFTEST__ === 'saver' ? 12000 : 40000;
 const CLOCK_MS = 60000;
+const FADE_MS = 2000; // must match the opacity transition on .saver-photo.top in index.css
 // Clock anchor spots (left, top) inside the 1920×1080 screen, spread so no pixel stays lit by the clock.
 const SPOTS: [number, number][] = [[140, 120], [1180, 140], [160, 780], [1140, 760], [640, 420], [220, 460], [1200, 460]];
 const PANS = ['pan-a', 'pan-b', 'pan-c', 'pan-d'];
@@ -88,12 +89,19 @@ export class Screensaver {
     ready.catch(() => undefined).then(() => {
       if (!this.active) return;
       requestAnimationFrame(() => {
-        incoming.className = 'saver-photo visible ' + pan;
-        outgoing.classList.remove('visible');
+        // True crossfade: the new photo fades in ON TOP of the old one, which stays fully opaque (and keeps
+        // drifting) underneath. Fading both at once dips to ~75% coverage and lets the black backdrop show.
+        outgoing.classList.add('under');
+        incoming.className = 'saver-photo visible top ' + pan;
         this.setCaption(b.name, b.credit);
         this.front = 1 - this.front;
-        // Release the old bitmap once it has faded out.
-        window.setTimeout(() => { if (!outgoing.classList.contains('visible')) outgoing.removeAttribute('src'); }, 2200);
+        // Once the new photo is fully opaque the old one is hidden behind it: drop it and free its bitmap.
+        window.setTimeout(() => {
+          if (this.front === 1 - this.layers.indexOf(outgoing)) {
+            outgoing.className = 'saver-photo';
+            outgoing.removeAttribute('src');
+          }
+        }, FADE_MS + 200);
       });
     });
   }

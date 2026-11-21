@@ -6,7 +6,7 @@ import { el } from '../components/dom';
 import { buildCatalog } from '../apps/catalog';
 import { tileGradient } from '../apps/artwork';
 import { addFavorite, removeFavorite, moveFavorite, MAX_FAVORITES } from '../apps/favorites';
-import { cachedApps, currentAppId } from '../platform/tizen';
+import { cachedApps, currentAppId, refreshApps, InstalledApp } from '../platform/tizen';
 import { settings } from '../settings/store';
 import type { Intent } from '../platform/keys';
 import type { Router, Screen } from './screen';
@@ -24,6 +24,8 @@ export class FavoritesScreen implements Screen {
   private others: string[] = [];
   private cursor = 0;
   private grabbed: string | null = null;
+  private visit = 0;
+  private refreshing = false;
 
   constructor(private router: Router) {
     this.root.appendChild(el('h1.settings-title', null, ['Favourites']));
@@ -33,15 +35,34 @@ export class FavoritesScreen implements Screen {
   }
 
   onShow(): void {
-    const s = settings.get();
-    const c = buildCatalog(cachedApps() || [], s, currentAppId());
+    this.build(cachedApps() || [], null);
+    this.grabbed = null;
+    // The cached list can be stale (an app installed since the launcher started), so ask the TV again.
+    const visit = ++this.visit;
+    this.refreshing = true;
+    this.render();
+    refreshApps().then((apps) => {
+      if (visit !== this.visit) return;
+      this.refreshing = false;
+      // Don't reshuffle rows under an app the user is holding; the cache is already updated for next time.
+      if (!this.grabbed) this.build(apps, this.id(this.cursor));
+      this.render();
+    }, () => {
+      if (visit !== this.visit) return;
+      this.refreshing = false;
+      this.render();
+    });
+  }
+
+  /** Builds the favourites/others lists from `installed`; keeps the cursor on `keepId` when it is still listed. */
+  private build(installed: InstalledApp[], keepId: string | null): void {
+    const c = buildCatalog(installed, settings.get(), currentAppId());
     this.labels = {};
     c.favorites.concat(c.others).forEach((a) => { this.labels[a.id] = a.label; });
     this.favs = c.favorites.map((a) => a.id);
     this.others = c.others.map((a) => a.id);
-    this.cursor = 0;
-    this.grabbed = null;
-    this.render();
+    const at = keepId ? this.favs.concat(this.others).indexOf(keepId) : -1;
+    this.cursor = at >= 0 ? at : 0;
   }
 
   private id(i: number): string { return i < this.favs.length ? this.favs[i] : this.others[i - this.favs.length]; }
@@ -71,7 +92,7 @@ export class FavoritesScreen implements Screen {
     // Keep the cursor inside the window of visible rows.
     const first = Math.max(0, Math.min(this.cursor - Math.floor(VISIBLE / 2), this.count() - VISIBLE));
     this.list.style.transform = 'translate3d(0,' + -first * ROW_H + 'px,0)';
-    this.hint.textContent = this.grabbed
+    this.hint.textContent = this.refreshing && !this.grabbed ? 'Refreshing apps…  ·  Back: close' : this.grabbed
       ? '▲ ▼ move  ·  ◀ remove from favourites  ·  OK or Back: done'
       : this.favs.length >= MAX_FAVORITES ? 'Favourites are full (' + MAX_FAVORITES + '). Remove one to add another  ·  Back: close'
       : 'OK on a favourite: move or remove it  ·  OK on another app: add it  ·  Back: close';

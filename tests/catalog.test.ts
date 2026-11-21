@@ -48,3 +48,15 @@ test('migrate v1 → v2 drops ZEE5 from favourites and hides unused apps, keepin
   // Already v2: the owner's own choices are left alone.
   assert.deepEqual(migrate({ ...s, favorites: ['wKDM33Rods.ZEE5'], hidden: [] }).favorites, ['wKDM33Rods.ZEE5']);
 });
+
+test('an app installed after the first listing shows up when the catalog is rebuilt from a fresh list', () => {
+  const s = migrate({ ...DEFAULTS, favorites: [], hidden: [] });
+  const before = installed.filter((a) => a.id !== 'wKDM33Rods.ZEE5');
+  assert.ok(!buildCatalog(before, s, 'x').others.some((a) => a.id === 'wKDM33Rods.ZEE5'));
+  assert.ok(buildCatalog(installed, s, 'x').others.some((a) => a.id === 'wKDM33Rods.ZEE5'));
+});
+
+test('hidden apps stay out of the editor lists', () => {
+  const c = buildCatalog(installed, migrate({ ...DEFAULTS, favorites: [], hidden: ['wKDM33Rods.ZEE5'] }), 'x');
+  assert.ok(!c.others.some((a) => a.id === 'wKDM33Rods.ZEE5'));
+});
